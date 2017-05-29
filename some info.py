@@ -2,11 +2,10 @@ __author__ = 'George'
 
 import random, genetic_creature
 overallCreatureNum = 0
-genNum = 0
 
 def genIteration(generation):
 
-    global overallCreatureNum, genNum
+    global overallCreatureNum
     closest = 0
 
     #the next few lines lay the base for 'natural selection'
@@ -35,14 +34,11 @@ def genIteration(generation):
         chanceList.remove(chanceList[closest])
         generation.remove(generation[closest])
 
-    for parentNum in range(len(generation)):   # repopulates generation with creatures based on survivors from previous generation
+    for parentNum in range(0, len(generation)-1):   # repopulates generation with creatures based on survivors from previous generation
         generation.append(genetic_creature.Creature(overallCreatureNum, generation[parentNum]))
         overallCreatureNum += 1
 
     generation = qsort(generation)
-
-    print("GENERATION " + str(genNum) + " GENERATED:")
-    genNum += 1
 
 
     return generation
@@ -80,18 +76,31 @@ def main():
     generation = [genetic_creature.Creature(i) for i in range(genLen)] #creates initial parent generation for next to evolve from
     input()
 
+    genNum = 0
     while True:
         for i in range(500):
             generation = genIteration(generation)
+
+        print("GENERATION " + str(genNum) + " GENERATED:")
+        genNum += 1
+
+        for creature in generation:
+            print(creature)
+        if y != "":
             for creature in generation:
-                print(creature)
-            if y != "":
-                for creature in generation:
-                    print("parent num = " + str(creature.parent.num))
-                    print("parent fit = " + str(creature.parent.fitness))
-                    print("creature num = " + str(creature.num))
-                    print("fitness: " + str(creature.fitness))
-                    print("")
+                print("parent num = " + str(creature.parent.num))
+                print("parent fit = " + str(creature.parent.fitness))
+                print("creature num = " + str(creature.num))
+                print("fitness: " + str(creature.fitness))
+                print("")
+        if y == "inf":
+            creature = generation[-1]
+            print("num: " + str(creature.num))
+            print("size: " + str(creature.size))
+            print("per: " + str(creature.per))
+            print("str: " + str(creature.str))
+            print("int: " + str(creature.int))
+            print("end: " + str(creature.end))
         y = input()
 
 
