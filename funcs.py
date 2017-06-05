@@ -1,12 +1,12 @@
-def qsort(list):
+def qsortGen(list):
     if list == []:
         return []
     else:
         pivot = list[0]
 
-        lesser = qsort([x for x in list[1:len(list)] if x.fitness < pivot.fitness])
+        lesser = qsortGen([x for x in list[1:len(list)] if x.fitness < pivot.fitness])
 
-        greater = qsort([x for x in list[1:len(list)] if x.fitness >= pivot.fitness])
+        greater = qsortGen([x for x in list[1:len(list)] if x.fitness >= pivot.fitness])
 
         return lesser + [pivot] + greater
 

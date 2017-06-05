@@ -3,17 +3,20 @@ __author__ = 'George'
 import random, genetic_creature, show, funcs
 genLen = 100
 generation = [genetic_creature.Creature(i) for i in range(genLen)] #creates initial parent generation for next to evolve from
-generation = funcs.qsort(generation)
+generation = funcs.qsortGen(generation)
 
 def setup():
     fullScreen()
     background(21, 34, 56)
     
     global hoverButton
-    hoverButton = Button(1350, 840, 70, 40)
+    hoverButton = Button(1350, 840, 70, 40, "Info", 5)
     
     global killButton
-    killButton = Button(1240,840, 70, 40, "Kill", 10)
+    killButton = Button(1240, 840, 70, 40, "Kill", 10)
+    
+    global reprButton
+    reprButton = Button(1020, 840 ,180, 40, "Reproduce", 10)
     
     global font
     font = loadFont("SansSerif-120.vlw")
@@ -22,18 +25,29 @@ def setup():
 def draw():
     clear()
     background(21, 34, 56)
-    hoverButton.showButton()
-    killButton.showButton()
-    
+
     show.drawGrid(20, height-820, 10, 10, 80, 200, 100)
     show.drawCreatureGrid(generation)
     
     if hoverButton.check == True:
         dispInfo()
         cursor(HAND)
-    elif killButton.check == True: 
-        cursor(HAND)
+        
+    elif 20 < mouseX < 820 and height-820 < mouseY < height - 20:
+        xIndex = int((mouseX-20)/80)
+        yIndex = int((mouseY-(height-820))/80)
+        creatureIndex = 10*(yIndex-1) + xIndex
+        show.creatureInfo(generation[creatureIndex])
+        
+    elif killButton.check == True or reprButton.check == True: 
+        cursor(HAND)    
+    
     else: cursor(ARROW)
+    
+    hoverButton.showButton()
+    killButton.showButton()
+    reprButton.showButton()
+    
     
 
 def mouseClicked():
@@ -44,6 +58,12 @@ def mouseClicked():
     if killButton.check == True:
         global generation
         generation = genetic_creature.naturalSelection(generation)
+        
+    if reprButton.check == True:
+        global generation
+        generation = genetic_creature.reproduction(generation)
+        
+    print(len(generation))
     
 class Button():
     def __init__(self, x, y, w, h, words = None, textOffset = None, colour = 210 ,tColour = 0,):
@@ -68,7 +88,7 @@ class Button():
         else: return False
         
 def dispInfo():        
-    fill(200)
+    fill(150)
     rect(1420,880, -820, -600)
     fill(0)
     text(

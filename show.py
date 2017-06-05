@@ -6,6 +6,10 @@ def showCreature(creature, x, y):
         fill(funcs.mapBetween(creature.str, 0, 1, 0, 255), 0, 0)
         polygon(x, y, funcs.mapBetween(creature.sze, 0, 1, 0, 30), funcs.mapBetween(1/(creature.str/creature.sze), 0, 1, 0, 40))
         stroke(200)
+    else:
+        stroke(50)
+        line(x-40, y-40, x+40, y+40)
+        line(x+40, y-40, x-40, y +40)
     
 def drawGrid(x ,y ,noCols ,noRows ,scl, colour, grdFill = None):
     stroke(colour)
@@ -29,6 +33,14 @@ def drawCreatureGrid(generation):
             xPos += 80
         xPos = 60
         yPos += 80
+        
+def creatureInfo(creature):
+    fill(150)
+    if mouseY < height/2:
+        rect(mouseX,mouseY, 120, 80)
+    else:
+        rect(mouseX, mouseY, 120, -80)
+    
         
 def polygon(x, y, radius, nPoints):
     angle = TWO_PI / nPoints
