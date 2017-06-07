@@ -1,9 +1,9 @@
 __author__ = 'George'
 #screen = 2880 x 1800
+
 import random, genetic_creature, show, funcs
 genLen = 100
-generation = [genetic_creature.Creature(i) for i in range(genLen)] #creates initial parent generation for next to evolve from
-generation = funcs.qsortGen(generation)
+generation = genetic_creature.initialise(genLen)
 
 def setup():
     fullScreen()
@@ -16,7 +16,11 @@ def setup():
     killButton = Button(1240, 840, 70, 40, "Kill", 10)
     
     global reprButton
-    reprButton = Button(1020, 840 ,180, 40, "Reproduce", 10)
+    reprButton = Button(1020, 840 ,180, 40, "RemoveFls", 10)
+    
+    global reprButton2
+    reprButton2 = Button(800, 840 ,180, 40, "Reproduce", 10)
+    
     
     global font
     font = loadFont("SansSerif-120.vlw")
@@ -27,7 +31,7 @@ def draw():
     background(21, 34, 56)
 
     show.drawGrid(20, height-820, 10, 10, 80, 200, 100)
-    show.drawCreatureGrid(generation)
+    show.drawCreatureGrid(generation, font)
     
     if hoverButton.check == True:
         dispInfo()
@@ -35,9 +39,9 @@ def draw():
         
     elif 20 < mouseX < 820 and height-820 < mouseY < height - 20:
         xIndex = int((mouseX-20)/80)
-        yIndex = int((mouseY-(height-820))/80)
+        yIndex = int((mouseY-(height-900))/80)
         creatureIndex = 10*(yIndex-1) + xIndex
-        show.creatureInfo(generation[creatureIndex])
+        show.creatureInfo(generation[creatureIndex], font)
         
     elif killButton.check == True or reprButton.check == True: 
         cursor(HAND)    
@@ -47,6 +51,8 @@ def draw():
     hoverButton.showButton()
     killButton.showButton()
     reprButton.showButton()
+    reprButton2.showButton()
+    
     
     
 
@@ -60,6 +66,10 @@ def mouseClicked():
         generation = genetic_creature.naturalSelection(generation)
         
     if reprButton.check == True:
+        global generation
+        generation = genetic_creature.removeFalses(generation)
+        
+    if reprButton2.check == True:
         global generation
         generation = genetic_creature.reproduction(generation)
         
@@ -77,6 +87,7 @@ class Button():
         rect(self.x,self.y,self.w,self.h)
         fill(self.tColour)
         if self.words:
+            textFont(font, 32)
             if not self.textOffset:
                 self.textOffset = 0
             text(self.words, self.x + self.textOffset, self.y + 32)
@@ -91,6 +102,7 @@ def dispInfo():
     fill(150)
     rect(1420,880, -820, -600)
     fill(0)
+    textFont(font, 32)
     text(
          """Info\n
 This is placeholder text\n
