@@ -1,87 +1,114 @@
 __author__ = 'George'
 
 import random, funcs
-MUTATIONRATE = 0.000001
-DEATHRANDOMNESS = 3 #low is more random
+
+DEATHRANDOMNESS = 10 #low is more random, 3 is good
+MAXSTARTSIZE = 0.1
+
+MUTATIONMAX = 0.4
+MUTATIONRATE = 3 #has to be odd
 overallCreatureNum = 0
 
 def initialise(genLen):
     #creates initial parent generation for next to evolve from
-    return  funcs.qsortGen([Creature(i) for i in range(genLen)])
+    generation = funcs.qsortGen([Creature(i) for i in range(genLen)])
+    generation.reverse()
+    return generation
 
 class Creature(object):
     def __init__(self, num, parent=None):
         try:
+            
+            self.sze = -1
+            self.per = -1
+            self.stren = -1
+            self.int = -1
+            self.end = -1
+            
+            while self.fitness <= 0:
+                self.sze = parent.sze + random.uniform(-MUTATIONMAX , MUTATIONMAX) ** MUTATIONRATE
+                self.per = parent.per + random.uniform(-MUTATIONMAX , MUTATIONMAX) ** MUTATIONRATE
+                self.stren = parent.stren + random.uniform(-MUTATIONMAX , MUTATIONMAX) ** MUTATIONRATE
+                self.int = parent.int + random.uniform(-MUTATIONMAX , MUTATIONMAX) ** MUTATIONRATE
+                self.end = parent.end + random.uniform(-MUTATIONMAX , MUTATIONMAX) ** MUTATIONRATE
+    
+                #set limits for sze
+                if self.sze > 1:
+                    self.sze = 1.0
+                if self.sze < MUTATIONMAX:
+                    self.sze = MUTATIONMAX
+    
+                #set limits for PERCEPTION
+                if self.per > self.sze :
+                    self.per = self.sze 
+                if self.per < 0:
+                    self.per = MUTATIONMAX
+    
+                #set limits for INTELLIGENCE
+                if self.int > self.sze :
+                    self.int = self.sze 
+                if self.int < 0:
+                    self.int = MUTATIONMAX
+                
+                #set limits for STRENGTH
+                if self.stren > self.sze :
+                    self.stren = self.sze 
+                if self.stren < 0:
+                    self.stren = MUTATIONMAX
+    
+    
+                #set limits for ENDURANCE
+                if self.end < 0:
+                    self.end = MUTATIONMAX
+                if self.end > self.sze:
+                    self.end = self.sze
+                
+                self.pnum = parent.num
 
-            self.sze = parent.sze + random.uniform(-MUTATIONRATE , MUTATIONRATE)
-            self.per = parent.per - (MUTATIONRATE * 0.5) + (random.random() / 1**MUTATIONRATE)
-            self.stren = parent.stren - (MUTATIONRATE * 0.5) + (random.random() / 1**MUTATIONRATE)
-            self.int = parent.int - (MUTATIONRATE * 0.5) + (random.random() / 1**MUTATIONRATE)
-            self.end = parent.end - (MUTATIONRATE * 0.5) + (random.random() / 1**MUTATIONRATE)
-
-            #set limits for sze
-            if self.sze < MUTATIONRATE:
-                self.sze = MUTATIONRATE
-            if self.sze > 1:
-                self.sze = 1.0
-
-            #set limits for PERCEPTION
-            if self.per > self.sze - self.stren - self.int:
-                self.per = self.sze - self.stren - self.int
-            if self.per < 0:
-                self.per = MUTATIONRATE
-
-            #set limits for STRENGTH
-            if self.stren > self.sze - self.per - self.int:
-                self.stren = self.sze - self.per - self.int
-            if self.stren < 0:
-                self.stren = MUTATIONRATE
-
-            #set limits for INTELLIGENCE
-            if self.int > self.sze - self.per - self.stren:
-                self.int = self.sze - self.per - self.stren
-            if self.int < 0:
-                self.int = MUTATIONRATE
-
-            #set limits for ENDURANCE
-            if self.end < 0:
-                self.end = MUTATIONRATE
-            if self.end > 0.5/self.sze:
-                self.end = 0.5/self.sze
-
+    
         except AttributeError:
+            
             global overallCreatureNum
             overallCreatureNum +=1
             self.parent = None
-            self.sze = random.uniform(MUTATIONRATE, 0.5)
-            self.per = random.uniform(0, self.sze/3)
-            self.stren = random.uniform(0, self.sze/3)
-            self.int = random.uniform(0, self.sze/3)
-            self.end = random.uniform(0, self.sze)
-
-            print("first creature " + str(num) + " made")
+            self.pnum = "No parent"
+            
+            while self.fitness <= 0:
+                self.sze = random.uniform(MUTATIONMAX, MAXSTARTSIZE)
+                self.per = random.uniform(0, self.sze/3)
+                self.stren = random.uniform(0, self.sze/3)
+                self.int = random.uniform(0, self.sze/3)
+                self.end = random.uniform(0, self.sze)
 
         self.num = num
         self.parent = parent
 
     @property
     def fitness(self):
-        speed = self.stren/self.sze
-        foodGathered = speed + self.per + self.int
-        foodSurvival = foodGathered - self.sze
-        survivalChance = self.end * self.int
-        fitness = foodSurvival * survivalChance
-        return fitness
+
+            speed = self.stren/self.sze
+            foodGathered = speed + self.per + self.int
+            foodSurvival = foodGathered - (self.sze/2)
+            survivalChance = self.end * self.int
+            fitness = foodSurvival * survivalChance
+            return fitness
 
     def __str__(self):
-        return "Creature " + str(self.num) + "\nFitness: " + str(round(self.fitness, 4)) + "\nSize:" + str(round(self.sze,4))
+        return ("Creature " + str(self.num) +
+        "\nFitness: " + str(round(self.fitness, 4)) +
+        "\nSize:" + str(round(self.sze,4)) + 
+        "\nPerception:" + str(round(self.per,4)) +
+        "\nStrength:" + str(round(self.stren,4)) +
+        "\nIntelligence:" + str(round(self.int,4)) +
+        "\nEndurance:" + str(round(self.end,4)) + 
+        "\nParent: " + str(self.pnum))
 
 
     #sze 0.0 - 1.0                             DONE
-    #perception 0.0 - (sze - str - int)        DONE
-    #strength 0.0 - (sze - per - int)          DONE
-    #intelligence 0.0 - (sze - per - str)      DONE
-    #endurance 0.0 - (0.5/sze)                 DONE
+    #perception 0.0 - 1                        DONE
+    #strength 0.0 - 1                          DONE
+    #intelligence 0.0 - 1                      DONE
+    #endurance 0.0 - 1                         DONE
 
     #speed = strength/sze
     #strength < (sze * 3) / 4
@@ -105,10 +132,10 @@ def naturalSelection(generation):
 
     for numberKilled in range(int(len(generation)/2)): # kills half of the generation population based on fitness value
 
-        toKill = int(funcs.mapBetween(1-(random.random() ** DEATHRANDOMNESS), 0, 1 ,0 , 100))
+        toKill = int(funcs.mapBetween(1-(random.random() ** DEATHRANDOMNESS), 0, 1 ,1 , len(generation)-1))
         while generation[toKill] == False:
             if toKill == -1:
-                toKill = 99
+                toKill = len(generation)-1
             else:
                 toKill -= 1
                 
@@ -122,12 +149,9 @@ def reproduction(generation):
     for parentNum in range(len(generation)):   # repopulates generation with creatures based on survivors from previous generation
         generation.append(Creature(overallCreatureNum, generation[parentNum]))
         overallCreatureNum += 1
-        print("CreatureNum " + str(overallCreatureNum) + " made")
 
-    
-    
     generation = funcs.qsortGen(generation)
-
+    generation.reverse()
 
     return generation
 
@@ -140,41 +164,4 @@ def removeFalses(generation):
     
 
 def genIteration(generation):
-
-    global overallCreatureNum
-    closest = 0
-
-    #the next few lines lay the base for 'natural selection'
-    #basically it makes a list of chances of survival those kills them with low values
-
-    minFit = min([creature.fitness for creature in generation])
-    maxFit = max([creature.fitness for creature in generation])
-
-    if minFit == maxFit:
-       maxFit += maxFit
-
-    chanceList = []
-    for creature in generation:
-        chance = funcs.mapBetween(creature.fitness, minFit, maxFit, 0, 1)
-        chanceList.append(chance)
-
-
-
-    for numberKilled in range(int(len(generation)/2)): # kills half of the generation population based on fitness value
-
-        poweredRandom = random.random() ** 20
-
-        while closest == len(generation)-1:
-            closest = min(range(len(chanceList)), key=lambda i: abs(chanceList[i]- poweredRandom))
-
-        chanceList.remove(chanceList[closest])
-        generation.remove(generation[closest])
-
-    for parentNum in range(0, len(generation)-1):   # repopulates generation with creatures based on survivors from previous generation
-        generation.append(genetic_creature.Creature(overallCreatureNum, generation[parentNum]))
-        overallCreatureNum += 1
-
-    generation = funcs.qsort(generation)
-
-
-    return generation
+    return reproduction(removeFalses(naturalSelection(generation)))
