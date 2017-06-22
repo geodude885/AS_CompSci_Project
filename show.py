@@ -3,15 +3,15 @@ def showCreature(creature, x, y, font):
     if creature != False:
         noStroke()
         
-        R = funcs.mapBetween(creature.stren, 0, 1, 0, 255)
-        G = funcs.mapBetween(creature.per, 0, 1, 0, 255)
-        B = funcs.mapBetween(creature.int, 0, 1, 0, 255)
+        R = funcs.mapBetween(creature.stren, 0, 1, 0, 200)
+        G = funcs.mapBetween(creature.per, 0, 1, 0, 200)
+        B = funcs.mapBetween(creature.int, 0, 1, 0, 200)
         
         fill(R,G,B)
-        noSides = funcs.mapBetween(creature.end, 0, 1, 0, 13) + 3
-        showSize = funcs.mapBetween(creature.sze, 0, 1, 0, 20)
+        noSides = funcs.mapBetween(creature.end, 0, 1, 3, 13) 
+        showSize = funcs.mapBetween(creature.sze, 0, 1, 1, 15)
         
-        polygon(x, y, showSize, noSides)
+        polygon(x, y, showSize, noSides, creature.type)
         
         stroke(200)
         fill(0)
@@ -61,12 +61,16 @@ def creatureInfo(creature, font):
     else: 
         text("Creature is dead", mouseX + 10-xoff, mouseY - yoff + 20)
         
-def polygon(x, y, radius, nPoints):
+def polygon(x, y, radius, nPoints, type): #variance is val 0-1
     angle = TWO_PI / nPoints
+    
     beginShape()
+    
+    i = 0
     for p in range(int(nPoints)):
         p = p * angle
-        dx = x + cos(p) * radius
-        dy = y + sin(p) * radius
+        dx = x + cos(p) * radius * noise(type + i)
+        dy = y + sin(p) * radius * noise(type + i)
+        i += 1000
         vertex(dx, dy)
     endShape(CLOSE)

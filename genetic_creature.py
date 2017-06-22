@@ -4,9 +4,11 @@ import random, funcs
 
 DEATHRANDOMNESS = 10 #low is more random, 3 is good
 MAXSTARTSIZE = 0.1
+MUTATIONMAX = 0.9
+MUTATIONRATE = 19 #has to be odd
+MINVAL = 0.00001
+TYPEMUTECHANCE = 0.01
 
-MUTATIONMAX = 0.4
-MUTATIONRATE = 3 #has to be odd
 overallCreatureNum = 0
 
 def initialise(genLen):
@@ -18,7 +20,6 @@ def initialise(genLen):
 class Creature(object):
     def __init__(self, num, parent=None):
         try:
-            
             self.sze = -1
             self.per = -1
             self.stren = -1
@@ -35,35 +36,39 @@ class Creature(object):
                 #set limits for sze
                 if self.sze > 1:
                     self.sze = 1.0
-                if self.sze < MUTATIONMAX:
-                    self.sze = MUTATIONMAX
+                if self.sze < MINVAL:
+                    self.sze = MINVAL
     
                 #set limits for PERCEPTION
                 if self.per > self.sze :
                     self.per = self.sze 
-                if self.per < 0:
-                    self.per = MUTATIONMAX
+                if self.per < MINVAL:
+                    self.per = MINVAL
     
                 #set limits for INTELLIGENCE
                 if self.int > self.sze :
                     self.int = self.sze 
-                if self.int < 0:
-                    self.int = MUTATIONMAX
+                if self.int < MINVAL:
+                    self.int = MINVAL
                 
                 #set limits for STRENGTH
                 if self.stren > self.sze :
                     self.stren = self.sze 
-                if self.stren < 0:
-                    self.stren = MUTATIONMAX
+                if self.stren < MINVAL:
+                    self.stren = MINVAL
     
     
                 #set limits for ENDURANCE
-                if self.end < 0:
-                    self.end = MUTATIONMAX
                 if self.end > self.sze:
                     self.end = self.sze
-                
+                if self.end < MINVAL:
+                    self.end = MINVAL
+                    
                 self.pnum = parent.num
+                if random.random() < TYPEMUTECHANCE:
+                    self.type *= random.randint(0, 10)
+                else:    
+                    self.type = parent.type
 
     
         except AttributeError:
@@ -72,26 +77,32 @@ class Creature(object):
             overallCreatureNum +=1
             self.parent = None
             self.pnum = "No parent"
+            self.type = overallCreatureNum
             
             while self.fitness <= 0:
-                self.sze = random.uniform(MUTATIONMAX, MAXSTARTSIZE)
-                self.per = random.uniform(0, self.sze/3)
-                self.stren = random.uniform(0, self.sze/3)
-                self.int = random.uniform(0, self.sze/3)
-                self.end = random.uniform(0, self.sze)
+                self.sze = random.uniform(MINVAL, MAXSTARTSIZE)
+                self.per = random.uniform(MINVAL, self.sze)
+                self.stren = random.uniform(MINVAL, self.sze)
+                self.int = random.uniform(MINVAL, self.sze)
+                self.end = random.uniform(0.5, self.sze)
 
         self.num = num
         self.parent = parent
 
     @property
     def fitness(self):
-
-            speed = self.stren/self.sze
-            foodGathered = speed + self.per + self.int
-            foodSurvival = foodGathered - (self.sze/2)
-            survivalChance = self.end * self.int
-            fitness = foodSurvival * survivalChance
-            return fitness
+        
+                speed = self.stren/self.sze
+                foodGathered = speed + self.per + self.int
+                foodSurvival = foodGathered - (self.sze/2)
+                survivalChance = self.end * self.int
+                fitness = foodSurvival * survivalChance
+                #if self.stren + self.per + self.end > self.sze:
+                #    fitness *= 0.1
+                #if self.int > foodGathered/2:
+                #    fitness /= 2
+                return fitness
+        
 
     def __str__(self):
         return ("Creature " + str(self.num) +

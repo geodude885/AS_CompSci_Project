@@ -1,15 +1,20 @@
 __author__ = 'George'
 #screen = 2880 x 1800
 
-import random, genetic_creature, show, funcs
+import random, time, genetic_creature, show, funcs
 genLen = 1000
+
 generation = genetic_creature.initialise(genLen)
 genCount = 0
 creatScreen = True
+genASAP = False
+showGenASAP = False
+showGenStep = 0
 
 def setup():
     fullScreen()
     background(21, 34, 56)
+    noiseDetail(12)
     
     global hoverButton
     hoverButton = Button(1350, 840, 70, 40, "Info", 5)
@@ -23,11 +28,13 @@ def setup():
     global iterButton
     iterButton = Button(1020, 760 ,180, 40, "Iteration", 10)
     
-    
     global font
+    
+    
     font = loadFont("SansSerif-120.vlw")
     textFont(font, 32)
     updateScreen()
+    
 
 def draw():
 
@@ -39,18 +46,42 @@ def draw():
     
     else: cursor(ARROW)
     
+    if genASAP == True:
+        global generation, genCount
+        generation = genetic_creature.genIteration(generation)
+        genCount += 1
+        updateScreen()
+    
+    if showGenASAP == True:
+        global generation, genCount, showGenStep
+        if showGenStep == 0:
+            generation = genetic_creature.naturalSelection(generation)
+            showGenStep = 1
+            updateScreen()
+        elif showGenStep == 1:
+            generation = genetic_creature.reproduction(genetic_creature.removeFalses(generation))
+            showGenStep = 0
+            genCount += 1
+            updateScreen()
+        updateScreen()
+    
 
 def updateScreen():
     clear()
     background(21, 34, 56)
     
     if creatScreen:
-        show.drawGrid(20, 40, 40, 25, 35, 32, 200, 100)
+        show.drawGrid(20, 40, 40, 25, 35, 32, 200, 250)
         show.drawCreatureGrid(generation, font, 38, height-842)
         
-        if 10 < mouseX < 1420 and 20 < mouseY < 840:
+        fill(200)
+        textFont(font, 32)
+        text("     EVOLUTION SIMULATOR V1", 20, 30)
+        text("GEN: " + str(genCount), 1200, 30)
+        
+        if 10 < mouseX < 1420 and 40 < mouseY < 840:
             xIndex = int((mouseX-20)/35)
-            yIndex = int((mouseY-72)/32)
+            yIndex = int((mouseY-8)/32)
             creatureIndex = (40*(yIndex-1) + xIndex)
             show.creatureInfo(generation[creatureIndex], font)
         
@@ -72,15 +103,25 @@ def updateScreen():
         iterButton.showButton()
         
 def keyPressed():
+    
     if key == TAB:
         global creatScreen
         creatScreen = not creatScreen
         updateScreen()
-    if key in ("I", "i"):
-        global generation, genCount
-        generation = genetic_creature.genIteration(generation)
-        genCount += 1
-        updateScreen()
+        
+    if creatScreen:
+        if key in ("I", "i"):
+            global generation, genCount
+            generation = genetic_creature.genIteration(generation)
+            genCount += 1
+            updateScreen()
+        if key in ("U", "u"):
+            global genASAP
+            genASAP = not genASAP
+            
+        if key in ("Y", "y"):
+            global showGenASAP
+            showGenASAP = not showGenASAP
 
 def mouseClicked():
     
