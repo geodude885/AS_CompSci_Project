@@ -11,6 +11,9 @@ genASAP = False
 showGenASAP = False
 showGenStep = 0
 
+topFit, botFit, avgFit = [], [], []
+
+
 def setup():
     fullScreen()
     background(21, 34, 56)
@@ -29,37 +32,41 @@ def setup():
     iterButton = Button(1020, 760 ,180, 40, "Iteration", 10)
     
     global font
-    
-    
     font = loadFont("SansSerif-120.vlw")
     textFont(font, 32)
     updateScreen()
     
 
 def draw():
-
-    if 10 < mouseX < 1420 and 30 < mouseY < height or hoverButton.check == True:
-        updateScreen()
+    if creatScreen:
+        if 10 < mouseX < 1430 and 30 < mouseY < height or hoverButton.check == True:
+            updateScreen()
 
     if killButton.check == True or reprButton.check == True: 
         cursor(HAND)    
-    
+    elif hoverButton.check == True:
+            dispInfo()
+            cursor(HAND)
     else: cursor(ARROW)
     
     if genASAP == True:
-        global generation, genCount
+        global generation, genCount, topFit, botFit, avgFit
         generation = genetic_creature.genIteration(generation)
+        topFit, botFit, avgFit = getVals(generation, topFit, botFit, avgFit)
+        
         genCount += 1
         updateScreen()
-    
+
     if showGenASAP == True:
-        global generation, genCount, showGenStep
+        global generation, genCount, showGenStep, topFit, botFit, avgFit
         if showGenStep == 0:
             generation = genetic_creature.naturalSelection(generation)
             showGenStep = 1
             updateScreen()
+            
         elif showGenStep == 1:
             generation = genetic_creature.reproduction(genetic_creature.removeFalses(generation))
+            topFit, botFit, avgFit = getVals(generation, topFit, botFit, avgFit)
             showGenStep = 0
             genCount += 1
             updateScreen()
@@ -69,6 +76,13 @@ def draw():
 def updateScreen():
     clear()
     background(21, 34, 56)
+    controls = """I = Evolve 1 generation
+U = Toggle evolve ASAP      Y = Toggle show evolution ASAP
+"""
+    fill(200)
+    textFont(font, 14)
+    text(controls, 20, 858)
+    
     
     if creatScreen:
         show.drawGrid(20, 40, 40, 25, 35, 32, 200, 250)
@@ -79,7 +93,7 @@ def updateScreen():
         text("     EVOLUTION SIMULATOR V1", 20, 30)
         text("GEN: " + str(genCount), 1200, 30)
         
-        if 10 < mouseX < 1420 and 40 < mouseY < 840:
+        if 20 < mouseX < 1420 and 40 < mouseY < 840:
             xIndex = int((mouseX-20)/35)
             yIndex = int((mouseY-8)/32)
             creatureIndex = (40*(yIndex-1) + xIndex)
@@ -91,11 +105,7 @@ def updateScreen():
         text("     EVOLUTION\nSIMULATOR V1", 1060, 60)
         text("GEN: " + str(genCount), 840, 186)
         
-        
-        if hoverButton.check == True:
-            dispInfo()
-            cursor(HAND)
-        
+        show.showFitGraph(font,topFit, botFit, avgFit, generation)
             
         hoverButton.showButton()
         killButton.showButton()
@@ -109,20 +119,26 @@ def keyPressed():
         creatScreen = not creatScreen
         updateScreen()
         
-    if creatScreen:
-        if key in ("I", "i"):
-            global generation, genCount
-            generation = genetic_creature.genIteration(generation)
-            genCount += 1
-            updateScreen()
-        if key in ("U", "u"):
-            global genASAP
-            genASAP = not genASAP
-            
-        if key in ("Y", "y"):
+
+    if key in ("I", "i"):
+        global generation, genCount, topFit, botFit, avgFit
+        generation = genetic_creature.genIteration(generation)
+        topFit, botFit, avgFit = getVals(generation, topFit, botFit, avgFit)
+        genCount += 1
+        updateScreen()
+    if key in ("U", "u"):
+        global genASAP
+        genASAP = not genASAP
+        
+    if key in ("Y", "y"):
+        if showGenStep == 0:
             global showGenASAP
             showGenASAP = not showGenASAP
-
+        else:
+            global showGenASAP, generation
+            showGenASAP = not showGenASAP
+            generation = genetic_creature.reproduction(genetic_creature.removeFalses(generation))
+            
 def mouseClicked():
     
     if hoverButton.check == True:
@@ -142,8 +158,9 @@ def mouseClicked():
         updateScreen()
         
     if iterButton.check == True:
-        global generation, genCount
+        global generation, genCount, topFit, botFit, avgFit
         generation = genetic_creature.genIteration(generation)
+        topFit, botFit, avgFit = getVals(generation, topFit, botFit, avgFit)
         genCount += 1
         updateScreen()
         
@@ -171,19 +188,29 @@ class Button():
             return True
         else: return False
         
-def dispInfo():        
-    fill(150)
-    rect(1420,880, -820, -600)
-    fill(0)
-    textFont(font, 32)
-    textLeading(15)
-    text(
+def dispInfo():
+    if 1355 < mouseX <1415 and 845 < mouseY < 875: 
+        fill(150)
+        rect(1420,880, -820, -600)
+        fill(0)
+        textFont(font, 32)
+        textLeading(15)
+        text(
          """Info\n
 This is placeholder text\n
 which will eventually be replace by\n
 text which describes how the evolution\n
 algorithm works."""
          , 620, 320)
+    else: updateScreen()
+    
+def getVals(generation, top, bot, mid):
+    top.append(generation[0].fitness)
+    bot.append(generation[-1].fitness)
+    mid.append(generation[len(generation)/2].fitness)
+    return top, bot, mid
+
+    
 
 
 #run for initial generaion:

@@ -4,10 +4,10 @@ import random, funcs
 
 DEATHRANDOMNESS = 10 #low is more random, 3 is good
 MAXSTARTSIZE = 0.1
-MUTATIONMAX = 0.9
-MUTATIONRATE = 19 #has to be odd
+MUTATIONMAX = 0.75
+MUTATIONRATE = 17 #has to be odd
 MINVAL = 0.00001
-TYPEMUTECHANCE = 0.01
+TYPEMUTECHANCE = 0.05
 
 overallCreatureNum = 0
 
@@ -19,6 +19,10 @@ def initialise(genLen):
 
 class Creature(object):
     def __init__(self, num, parent=None):
+        self.num = num
+        self.parent = parent
+        self.age = 0
+        
         try:
             self.sze = -1
             self.per = -1
@@ -84,24 +88,23 @@ class Creature(object):
                 self.per = random.uniform(MINVAL, self.sze)
                 self.stren = random.uniform(MINVAL, self.sze)
                 self.int = random.uniform(MINVAL, self.sze)
-                self.end = random.uniform(0.5, self.sze)
+                self.end = random.uniform(MINVAL, self.sze)
 
-        self.num = num
-        self.parent = parent
 
     @property
     def fitness(self):
         
-                speed = self.stren/self.sze
-                foodGathered = speed + self.per + self.int
-                foodSurvival = foodGathered - (self.sze/2)
-                survivalChance = self.end * self.int
-                fitness = foodSurvival * survivalChance
-                #if self.stren + self.per + self.end > self.sze:
-                #    fitness *= 0.1
-                #if self.int > foodGathered/2:
-                #    fitness /= 2
-                return fitness
+        if self.age <= 30:
+            speed = self.stren/self.sze
+            foodGathered = speed + self.per + self.int
+            foodSurvival = foodGathered - (self.sze/2)
+            survivalChance = self.end * self.int
+            fitness = foodSurvival * survivalChance
+            #if self.stren + self.per + self.end > self.sze:
+            #    fitness *= 0.1
+            #if self.int > foodGathered/2:
+            #    fitness /= 2
+            return fitness
         
 
     def __str__(self):
@@ -113,6 +116,7 @@ class Creature(object):
         "\nIntelligence:" + str(round(self.int,4)) +
         "\nEndurance:" + str(round(self.end,4)) + 
         "\nParent: " + str(self.pnum))
+        
 
 
     #sze 0.0 - 1.0                             DONE
@@ -163,6 +167,7 @@ def reproduction(generation):
 
     generation = funcs.qsortGen(generation)
     generation.reverse()
+    
 
     return generation
 

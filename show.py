@@ -1,4 +1,5 @@
 import funcs, math
+
 def showCreature(creature, x, y, font):
     if creature != False:
         noStroke()
@@ -74,3 +75,50 @@ def polygon(x, y, radius, nPoints, type): #variance is val 0-1
         i += 1000
         vertex(dx, dy)
     endShape(CLOSE)
+    
+    
+def graphData(arr, x, y, w, h, font, maxVal,  rval = 0,):
+    
+    stroke(0)
+    line(x,y,x,y+h)
+    line(x, y+h, x+w, y+h)
+    fill(0)
+    textFont(font, 16)
+    text("0",x, y+ h +17)
+    text(str(len(arr)), x+w-16, y+h + 17)
+    text(str(round(maxVal, 4)), x-16, y-4)
+    
+    if len(arr) != 0:
+        xspacing = float(w)/float(len(arr))
+    else: xspacing = w
+    dx = xspacing
+    
+    stroke(rval, 0, 0)
+    prevPoint = 0
+    yMult = h/maxVal
+    
+    for plotPoint in arr:
+        x1 = x + dx-xspacing
+        x2 = x + dx
+        y1 = y+h-(prevPoint*yMult)
+        y2 = y+h-(plotPoint*yMult)
+        
+        line(x1, y1, x2, y2)
+        
+        prevPoint = plotPoint
+        dx += xspacing
+    
+def showFitGraph(font, topFit, botFit, avgFit, generation):
+    
+    
+    rect(10, 10, 550, 280)
+    fill(0)
+    textFont(font, 24)
+    text("Fitness:  ", 25, 35)
+    graphData(topFit, 40, 70, 500, 200, font, generation[0].fitness)
+    graphData(avgFit, 40, 70, 500, 200, font, generation[0].fitness, 255)
+    graphData(botFit, 40, 70, 500, 200, font, generation[0].fitness)
+
+
+
+    
