@@ -108,16 +108,62 @@ def graphData(arr, x, y, w, h, font, maxVal,  rval = 0,):
         prevPoint = plotPoint
         dx += xspacing
     
-def showFitGraph(font, topFit, botFit, avgFit, generation):
-    
-    
+def showFitGraph(font, topFit, botFit, avgFit, generation, name):
     rect(10, 10, 550, 280)
     fill(0)
     textFont(font, 24)
-    text("Fitness:  ", 25, 35)
+    text(name, 25, 35)
     graphData(topFit, 40, 70, 500, 200, font, generation[0].fitness)
     graphData(avgFit, 40, 70, 500, 200, font, generation[0].fitness, 255)
     graphData(botFit, 40, 70, 500, 200, font, generation[0].fitness)
+    
+def showTypeChart(x, y, sze, types, font):
+    angle = 0
+    tot = 0
+    firstType, secondType, thirdType = 0, 0, 0
+    firstTypeNo, secondTypeNo, thirdTypeNo = -1, -1, -1
+    
+    for n in [type[1] for type in types]:
+        tot += n
+    
+    for type in types:
+        if type[1] > thirdTypeNo:
+            if type[1] > secondTypeNo:
+                if type[1] > firstTypeNo:
+                    firstType = type[0]
+                    firstTypeNo, secondTypeNo, thirdTypeNo = type[1], firstTypeNo, secondTypeNo
+                else: 
+                    secondType = type[0]
+                    secondTypeNo, thirdTypeNo = type[1], secondTypeNo
+            else: 
+                thirdType = type[0]
+                thirdTypeNo = type[1]
+        
+        fill(map(noise(type[0]), 0, 1, 0, 255), map(noise(type[0] + 1), 0, 1, 0, 255), map(noise(type[0] + 2), 0, 1, 0, 255))
+        prevAngle = angle
+        angle = angle + (((2*PI)/tot) * type[1])
+        arc(x, y, sze, sze, prevAngle, angle)
+    fill(200)
+    rect(x + 190, y-sze/2 + 15, 280, 180)
+    
+    string = ("Dominant Types:\n\n" +
+    "1st:    Type " + str(firstType) + "  at: " + str(float(firstTypeNo)/10) + "%" +
+    "\n\n2nd:    Type " + str(secondType) + "  at: " + str(float(secondTypeNo)/10) + "%" +
+    "\n\n3rd:    Type " + str(thirdType)) + "  at: " + str(float(thirdTypeNo)/10) + "%"
+    
+    fill(map(noise(firstType), 0, 1, 0, 255), map(noise(firstType + 1), 0, 1, 0, 255), map(noise(firstType + 2), 0, 1, 0, 255))
+    rect(x+205, y-83, 50, 20)
+    fill(map(noise(secondType), 0, 1, 0, 255), map(noise(secondType + 1), 0, 1, 0, 255), map(noise(secondType + 2), 0, 1, 0, 255))
+    rect(x+205, y-38, 50, 20)
+    fill(map(noise(thirdType), 0, 1, 0, 255), map(noise(thirdType + 1), 0, 1, 0, 255), map(noise(thirdType + 2), 0, 1, 0, 255))
+    rect(x+205, y+7, 50, 20)
+    fill(0)
+    textFont(font, 18)
+    text(string, x+210, y-sze/2 + 40)
+    
+    
+    
+    
 
 
 

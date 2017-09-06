@@ -12,6 +12,7 @@ showGenASAP = False
 showGenStep = 0
 
 topFit, botFit, avgFit = [], [], []
+types = genetic_creature.getTypes(generation)
 
 
 def setup():
@@ -50,9 +51,10 @@ def draw():
     else: cursor(ARROW)
     
     if genASAP == True:
-        global generation, genCount, topFit, botFit, avgFit
+        global generation, genCount, topFit, botFit, avgFit, types
         generation = genetic_creature.genIteration(generation)
         topFit, botFit, avgFit = getVals(generation, topFit, botFit, avgFit)
+        types = genetic_creature.getTypes(generation)
         
         genCount += 1
         updateScreen()
@@ -67,6 +69,7 @@ def draw():
         elif showGenStep == 1:
             generation = genetic_creature.reproduction(genetic_creature.removeFalses(generation))
             topFit, botFit, avgFit = getVals(generation, topFit, botFit, avgFit)
+            types = genetic_creature.getTypes(generation)
             showGenStep = 0
             genCount += 1
             updateScreen()
@@ -105,7 +108,8 @@ U = Toggle evolve ASAP      Y = Toggle show evolution ASAP
         text("     EVOLUTION\nSIMULATOR V1", 1060, 60)
         text("GEN: " + str(genCount), 840, 186)
         
-        show.showFitGraph(font,topFit, botFit, avgFit, generation)
+        show.showFitGraph(font,topFit, botFit, avgFit, generation, "Fitness:  ")
+        show.showTypeChart(180, 470, 300, types, font)
             
         hoverButton.showButton()
         killButton.showButton()
@@ -121,9 +125,10 @@ def keyPressed():
         
 
     if key in ("I", "i"):
-        global generation, genCount, topFit, botFit, avgFit
+        global generation, genCount, topFit, botFit, avgFit, types
         generation = genetic_creature.genIteration(generation)
         topFit, botFit, avgFit = getVals(generation, topFit, botFit, avgFit)
+        types = genetic_creature.getTypes(generation)
         genCount += 1
         updateScreen()
     if key in ("U", "u"):

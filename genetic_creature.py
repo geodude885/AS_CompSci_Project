@@ -7,9 +7,10 @@ MAXSTARTSIZE = 0.1
 MUTATIONMAX = 0.75
 MUTATIONRATE = 17 #has to be odd
 MINVAL = 0.00001
-TYPEMUTECHANCE = 0.05
+TYPEMUTECHANCE = 0.01
 
 overallCreatureNum = 0
+nat, rem, rep = False, False, True
 
 def initialise(genLen):
     #creates initial parent generation for next to evolve from
@@ -100,8 +101,7 @@ class Creature(object):
             foodSurvival = foodGathered - (self.sze/2)
             survivalChance = self.end * self.int
             fitness = foodSurvival * survivalChance
-            #if self.stren + self.per + self.end > self.sze:
-            #    fitness *= 0.1
+            fitness *= self.sze / (self.stren + self.per + self.end)
             #if self.int > foodGathered/2:
             #    fitness /= 2
             return fitness
@@ -115,15 +115,16 @@ class Creature(object):
         "\nStrength:" + str(round(self.stren,4)) +
         "\nIntelligence:" + str(round(self.int,4)) +
         "\nEndurance:" + str(round(self.end,4)) + 
-        "\nParent: " + str(self.pnum))
+        "\nParent: " + str(self.pnum) +
+        "\nType: " + str(self.type))
         
 
 
-    #sze 0.0 - 1.0                             DONE
-    #perception 0.0 - 1                        DONE
-    #strength 0.0 - 1                          DONE
-    #intelligence 0.0 - 1                      DONE
-    #endurance 0.0 - 1                         DONE
+    #sze           0 - 1                      DONE
+    #perception    0 - 1                      DONE
+    #strength      0 - 1                      DONE
+    #intelligence  0 - 1                      DONE
+    #endurance     0 - 1                      DONE
 
     #speed = strength/sze
     #strength < (sze * 3) / 4
@@ -134,50 +135,74 @@ class Creature(object):
 
     #fitness = foodGathered * endurance
 
-
-    #sze 0.0 - 1.0 
-    #endurance: 0.0 - 1.0
     
 def naturalSelection(generation):
-    closest = 0
-
-    #the next few lines lay the base for 'natural selection'
-    #basically it makes a list of chances of survival those kills them with low values
-    
-
-    for numberKilled in range(int(len(generation)/2)): # kills half of the generation population based on fitness value
-
-        toKill = int(funcs.mapBetween(1-(random.random() ** DEATHRANDOMNESS), 0, 1 ,1 , len(generation)-1))
-        while generation[toKill] == False:
-            if toKill == -1:
-                toKill = len(generation)-1
-            else:
-                toKill -= 1
-                
-        generation[toKill] = False
+    global nat, rep
+    if rep == True:
+        closest = 0
+        #the next few lines lay the base for 'natural selection'
+        #basically it makes a list of chances of survival those kills them with low values
         
+        for numberKilled in range(int(len(generation)/2)): # kills half of the generation population based on fitness value
+            toKill = int(funcs.mapBetween(1-(random.random() ** DEATHRANDOMNESS), 0, 1 ,1 , len(generation)-1))
+            while generation[toKill] == False:
+                if toKill == -1:
+                    toKill = len(generation)-1
+                else:
+                    toKill -= 1
+            generation[toKill] = False
+        nat = True 
+        rep = False
     return generation
     
 def reproduction(generation):
-    global overallCreatureNum
-    
-    for parentNum in range(len(generation)):   # repopulates generation with creatures based on survivors from previous generation
-        generation.append(Creature(overallCreatureNum, generation[parentNum]))
-        overallCreatureNum += 1
-
-    generation = funcs.qsortGen(generation)
-    generation.reverse()
-    
-
+    global rem, rep
+    if rem == True:
+        global overallCreatureNum
+        for parentNum in range(len(generation)):   # repopulates generation with creatures based on survivors from previous generation
+            generation.append(Creature(overallCreatureNum, generation[parentNum]))
+            overallCreatureNum += 1
+        generation = funcs.qsortGen(generation)
+        generation.reverse()
+        rem = False
+        rep = True
     return generation
 
 def removeFalses(generation):
-    while False in generation:
-        for creature in generation:
-            if creature == False:
-                generation.remove(creature)
+    global rep, rem
+    if nat == True:
+        while False in generation:
+            for creature in generation:
+                if creature == False:
+                    generation.remove(creature)
+            rep = False
+        rem = True
     return generation
     
 
 def genIteration(generation):
     return reproduction(removeFalses(naturalSelection(generation)))
+
+
+
+def getTypes(generation):
+    
+    types = []
+    for creature in generation:
+        if creature.type not in [type[0] for type in types]:
+            types.append([creature.type, 1])
+        else:
+            for type in types:
+                if type[0] == creature.type:
+                    type[1] += 1
+    return types
+            
+    
+    
+    
+    
+    
+    
+    
+    
+    
