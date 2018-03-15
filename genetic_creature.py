@@ -12,6 +12,26 @@ TYPEMUTECHANCE = 0.01
 overallCreatureNum = 0
 nat, rem, rep = False, False, True
 
+class Environment(object):
+    def __init__(self):
+        self.warmth = 1.0
+        self.foodDensity = 1.0
+        self.waterDensity = 1.0
+        self.badWeather = 1.0
+        
+    def update(self, warmth, food, water, weather):
+        self.warmth = warmth
+        self.foodDensity = food
+        self. waterDensity = water
+        self.badWeather = weather
+
+def updateEnvironment(warmth, food, water, weather):
+    environment.update(warmth, food, water, weather)
+
+environment = Environment()
+environment.update(1.0, 1.0, 1.0, 1.0)
+
+
 def initialise(genLen):
     #creates initial parent generation for next to evolve from
     generation = funcs.qsortGen([Creature(i) for i in range(genLen)])
@@ -23,6 +43,7 @@ class Creature(object):
         self.num = num
         self.parent = parent
         self.age = 0
+        self.pnum = num
         
         try:
             self.sze = -1
@@ -30,7 +51,7 @@ class Creature(object):
             self.stren = -1
             self.int = -1
             self.end = -1
-            
+                
             while self.fitness <= 0:
                 self.sze = parent.sze + random.uniform(-MUTATIONMAX , MUTATIONMAX) ** MUTATIONRATE
                 self.per = parent.per + random.uniform(-MUTATIONMAX , MUTATIONMAX) ** MUTATIONRATE
@@ -70,12 +91,12 @@ class Creature(object):
                     self.end = MINVAL
                     
                 self.pnum = parent.num
+                
                 if random.random() < TYPEMUTECHANCE:
                     self.type *= random.randint(0, 10)
                 else:    
                     self.type = parent.type
 
-    
         except AttributeError:
             
             global overallCreatureNum
@@ -94,17 +115,25 @@ class Creature(object):
 
     @property
     def fitness(self):
-        
+
         if self.age <= 30:
+            """speed = self.stren/self.sze
+            foodGathered = (speed + self.per + self.int) * environment.foodDensity
+            foodSurvival = foodGathered - (self.sze / (2 * environment.waterDensity))
+            survivalChance = self.end * self.int * (environment.warmth / self.sze)
+            fitness = foodSurvival * survivalChance * (self.sze / (self.stren + self.per + (self.end * 2 * environment.badWeather)))"""
+            
             speed = self.stren/self.sze
             foodGathered = speed + self.per + self.int
             foodSurvival = foodGathered - (self.sze/2)
             survivalChance = self.end * self.int
             fitness = foodSurvival * survivalChance
             fitness *= self.sze / (self.stren + self.per + self.end)
-            #if self.int > foodGathered/2:
-            #    fitness /= 2
+            
+ 
             return fitness
+        else:
+            return 0
         
 
     def __str__(self):
@@ -117,7 +146,6 @@ class Creature(object):
         "\nEndurance:" + str(round(self.end,4)) + 
         "\nParent: " + str(self.pnum) +
         "\nType: " + str(self.type))
-        
 
 
     #sze           0 - 1                      DONE
