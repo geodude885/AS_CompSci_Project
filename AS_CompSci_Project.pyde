@@ -88,6 +88,7 @@ def draw():
         
     if mousePressed:
         updateScreen()
+    
 
 def updateScreen():
     clear()
@@ -106,7 +107,7 @@ U = Toggle evolve ASAP      Y = Toggle show evolution ASAP
         
         fill(200)
         textFont(font, 32)
-        text("     EVOLUTION SIMULATOR V1", 20, 30)
+        text("     EVOLUTION SIMULATOR V1.11", 20, 30)
         text("GEN: " + str(genCount), 1200, 30)
         
         if 20 < mouseX < 1420 and 40 < mouseY < 840:
@@ -217,19 +218,49 @@ class Button():
 def dispInfo():
     if 1355 < mouseX <1415 and 845 < mouseY < 875: 
         fill(150)
-        rect(1420,880, -820, -600)
+        rect(1420,880, -1320, -600)
         fill(0)
         textFont(font, 32)
         textLeading(15)
         text(
          """Info\n
-This is placeholder text\n
-which will eventually be replace by\n
-text which describes how the evolution\n
-algorithm works."""
+\n
+This page shows information about the creatures,\n
+and allows you to change their environment.\n
+The creatures with the greatest fitness are more\n
+likely to survive each generation. The surviving\n
+creatures then replicate themselves, and their\n
+attributes mutate each time they reproduce, like\n
+in evolution. The fitness of each creature is\n
+then worked out from its attributes, taking into\n
+account the environment settings.\n
+\n
+"""
          , 620, 320)
+        text(
+         """How Attributes\n
+Effect Creatures:\n
+
+Creature Number:\n
+No effect on fitness\n
+
+Fitness:\n
+The most important attribute\n
+calculated from the rest, is\n
+what decides if the creature\n
+survives a generation\n
+
+Size:\n
+
+
+
+
+\n
+"""
+         , 120, 320)
     else: updateScreen()
-    
+#fitness = (environment.foodDensity + self.sze) * environment.warmth * environment.waterDensity / self.stren + self.per + (self.end * 2 * environment.badWeather)
+            
 def getVals(generation, top, bot, mid):
     top.append(generation[0].fitness)
     bot.append(generation[-1].fitness)

@@ -163,9 +163,13 @@ def showFitGraph(font, topFit, botFit, avgFit, generation, name):
     fill(0)
     textFont(font, 24)
     text(name, 25, 35)
-    graphData(topFit, 40, 70, 500, 200, font, generation[0].fitness)
-    graphData(avgFit, 40, 70, 500, 200, font, generation[0].fitness, 255)
-    graphData(botFit, 40, 70, 500, 200, font, generation[0].fitness)
+    maxVal = 0
+    for creature in generation:
+        if creature.fitness > maxVal:
+            maxVal = creature.fitness
+    graphData(topFit, 40, 70, 500, 200, font, maxVal)
+    graphData(avgFit, 40, 70, 500, 200, font, maxVal, 255)
+    graphData(botFit, 40, 70, 500, 200, font, maxVal)
 
 def showTypeChart(x, y, sze, types, font):
     angle = 0

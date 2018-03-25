@@ -7,7 +7,7 @@ MAXSTARTSIZE = 0.1
 MUTATIONMAX = 0.75
 MUTATIONRATE = 17 #has to be odd
 MINVAL = 0.00001
-TYPEMUTECHANCE = 0.01
+TYPEMUTECHANCE = 0.005
 
 overallCreatureNum = 0
 nat, rem, rep = False, False, True
@@ -117,20 +117,7 @@ class Creature(object):
     def fitness(self):
 
         if self.age <= 30:
-            """speed = self.stren/self.sze
-            foodGathered = (speed + self.per + self.int) * environment.foodDensity
-            foodSurvival = foodGathered - (self.sze / (2 * environment.waterDensity))
-            survivalChance = self.end * self.int * (environment.warmth / self.sze)
-            fitness = foodSurvival * survivalChance * (self.sze / (self.stren + self.per + (self.end * 2 * environment.badWeather)))"""
-            
-            speed = self.stren/self.sze
-            foodGathered = speed + self.per + self.int
-            foodSurvival = foodGathered - (self.sze/2)
-            survivalChance = self.end * self.int
-            fitness = foodSurvival * survivalChance
-            fitness *= self.sze / (self.stren + self.per + self.end)
-            
- 
+            fitness = (environment.foodDensity + self.sze) * environment.warmth * environment.waterDensity / self.stren + self.per + (self.end * 2 * environment.badWeather)
             return fitness
         else:
             return 0
@@ -146,7 +133,15 @@ class Creature(object):
         "\nEndurance:" + str(round(self.end,4)) + 
         "\nParent: " + str(self.pnum) +
         "\nType: " + str(self.type))
-
+    
+        """
+            speed = self.stren/self.sze
+            foodGathered = speed + self.per + self.int
+            foodSurvival = foodGathered - (self.sze/2)
+            survivalChance = self.end * self.int
+            fitness = foodSurvival * survivalChance
+            fitness *= self.sze / (self.stren + self.per + self.end)
+        """
 
     #sze           0 - 1                      DONE
     #perception    0 - 1                      DONE
