@@ -5,7 +5,7 @@ import random, funcs
 DEATHRANDOMNESS = 10 #low is more random, 3 is good
 MAXSTARTSIZE = 0.1
 MUTATIONMAX = 0.75
-MUTATIONRATE = 17 #has to be odd
+MUTATIONRATE = 13 #has to be odd
 MINVAL = 0.00001
 TYPEMUTECHANCE = 0.005
 
@@ -42,7 +42,6 @@ class Creature(object):
     def __init__(self, num, parent=None):
         self.num = num
         self.parent = parent
-        self.age = 0
         self.pnum = num
         
         try:
@@ -52,13 +51,30 @@ class Creature(object):
             self.int = -1
             self.end = -1
                 
+            if random.random() < TYPEMUTECHANCE:
+                
+                self.type = random.randint(1, 10**4)
+                typeMute = True
+            else:    
+                typeMute = False
+                self.type = parent.type
+                
             while self.fitness <= 0:
-                self.sze = parent.sze + random.uniform(-MUTATIONMAX , MUTATIONMAX) ** MUTATIONRATE
-                self.per = parent.per + random.uniform(-MUTATIONMAX , MUTATIONMAX) ** MUTATIONRATE
-                self.stren = parent.stren + random.uniform(-MUTATIONMAX , MUTATIONMAX) ** MUTATIONRATE
-                self.int = parent.int + random.uniform(-MUTATIONMAX , MUTATIONMAX) ** MUTATIONRATE
-                self.end = parent.end + random.uniform(-MUTATIONMAX , MUTATIONMAX) ** MUTATIONRATE
-    
+                
+                if typeMute == False:
+                    self.sze = parent.sze + random.uniform(-MUTATIONMAX , MUTATIONMAX) ** MUTATIONRATE
+                    self.per = parent.per + random.uniform(-MUTATIONMAX , MUTATIONMAX) ** MUTATIONRATE
+                    self.stren = parent.stren + random.uniform(-MUTATIONMAX , MUTATIONMAX) ** MUTATIONRATE
+                    self.int = parent.int + random.uniform(-MUTATIONMAX , MUTATIONMAX) ** MUTATIONRATE
+                    self.end = parent.end + random.uniform(-MUTATIONMAX , MUTATIONMAX) ** MUTATIONRATE
+                    
+                if typeMute == True:
+                    self.sze = parent.sze + 5 * random.uniform(-MUTATIONMAX , MUTATIONMAX) ** MUTATIONRATE 
+                    self.per = parent.per + 5 * random.uniform(-MUTATIONMAX , MUTATIONMAX) ** MUTATIONRATE
+                    self.stren = parent.stren + 5 * random.uniform(-MUTATIONMAX , MUTATIONMAX) ** MUTATIONRATE
+                    self.int = parent.int + 5 * random.uniform(-MUTATIONMAX , MUTATIONMAX) ** MUTATIONRATE
+                    self.end = parent.end + 5 * random.uniform(-MUTATIONMAX , MUTATIONMAX) ** MUTATIONRATE
+                    
                 #set limits for sze
                 if self.sze > 1:
                     self.sze = 1.0
@@ -91,11 +107,6 @@ class Creature(object):
                     self.end = MINVAL
                     
                 self.pnum = parent.num
-                
-                if random.random() < TYPEMUTECHANCE:
-                    self.type *= random.randint(0, 10)
-                else:    
-                    self.type = parent.type
 
         except AttributeError:
             
@@ -116,11 +127,10 @@ class Creature(object):
     @property
     def fitness(self):
 
-        if self.age <= 30:
-            fitness = (environment.foodDensity + self.sze) * environment.warmth * environment.waterDensity / self.stren + self.per + (self.end * 2 * environment.badWeather)
-            return fitness
-        else:
-            return 0
+        fitness = (environment.foodDensity + self.sze) * environment.warmth * environment.waterDensity / + 1 + self.per + (self.end * 2 * environment.badWeather)
+        fitness += self.stren * environment.foodDensity + self.int * environment.waterDensity
+        return fitness
+
         
 
     def __str__(self):
@@ -134,29 +144,12 @@ class Creature(object):
         "\nParent: " + str(self.pnum) +
         "\nType: " + str(self.type))
     
-        """
-            speed = self.stren/self.sze
-            foodGathered = speed + self.per + self.int
-            foodSurvival = foodGathered - (self.sze/2)
-            survivalChance = self.end * self.int
-            fitness = foodSurvival * survivalChance
-            fitness *= self.sze / (self.stren + self.per + self.end)
-        """
 
     #sze           0 - 1                      DONE
     #perception    0 - 1                      DONE
     #strength      0 - 1                      DONE
     #intelligence  0 - 1                      DONE
     #endurance     0 - 1                      DONE
-
-    #speed = strength/sze
-    #strength < (sze * 3) / 4
-    #strength < endurance
-    #foodGathered = (speed + perception + intelligence)
-    #foodSurvival = foodGathered - sze
-    #endurance < 0.5/sze
-
-    #fitness = foodGathered * endurance
 
     
 def naturalSelection(generation):
@@ -194,19 +187,20 @@ def reproduction(generation):
 def removeFalses(generation):
     global rep, rem
     if nat == True:
+        
         while False in generation:
             for creature in generation:
                 if creature == False:
                     generation.remove(creature)
-            rep = False
+                    
+        rep = False
         rem = True
     return generation
+    
     
 
 def genIteration(generation):
     return reproduction(removeFalses(naturalSelection(generation)))
-
-
 
 def getTypes(generation):
     

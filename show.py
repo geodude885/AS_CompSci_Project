@@ -5,8 +5,8 @@ def showCreature(creature, x, y, font):
     if creature != False:
         noStroke()
         
-        fill(map(noise(creature.type), 0, 1, 150, 255), map(
-            noise(creature.type + 1), 0, 1, 150, 255), map(noise(creature.type + 2), 0, 1, 150, 255))
+        fill(funcs.mapBetween(noise(creature.type), 0, 1, 150, 255), funcs.mapBetween(
+            noise(creature.type + 1), 0, 1, 150, 255), funcs.mapBetween(noise(creature.type + 2), 0, 1, 150, 255))
         rect(x - 17, y - 17, 34, 31)
         
         R = funcs.mapBetween(creature.stren, 0, 1, 0, 200)
@@ -123,6 +123,32 @@ class Slider(object):
     @property
     def value(self):
         return float(self.pos) / self.l
+    
+    
+class Button():
+    def __init__(self, x, y, w, h, font, words = None, textOffset = None, colour = 210 ,tColour = 0):
+        self.font = font
+        self.x, self.y = x, y
+        self.w, self.h = w, h
+        self.colour, self.tColour = colour, tColour
+        self.words, self.textOffset = words, textOffset
+        
+    def showButton(self):
+        fill(self.colour)
+        rect(self.x,self.y,self.w,self.h)
+        fill(self.tColour)
+        if self.words:
+            textFont(self.font, 32)
+            if not self.textOffset:
+                self.textOffset = 0
+            text(self.words, self.x + self.textOffset, self.y + 32)
+        
+    @property
+    def check(self):
+        if self.x < mouseX < self.x + self.w and self.y < mouseY < self.y + self.h:
+            return True
+        else: return False
+        
 
 def graphData(arr, x, y, w, h, font, maxVal, rval=0,):
 
@@ -164,12 +190,16 @@ def showFitGraph(font, topFit, botFit, avgFit, generation, name):
     textFont(font, 24)
     text(name, 25, 35)
     maxVal = 0
-    for creature in generation:
-        if creature.fitness > maxVal:
-            maxVal = creature.fitness
-    graphData(topFit, 40, 70, 500, 200, font, maxVal)
-    graphData(avgFit, 40, 70, 500, 200, font, maxVal, 255)
-    graphData(botFit, 40, 70, 500, 200, font, maxVal)
+    try:
+        for val in topFit:
+            if val > maxVal:
+                maxVal = val
+        
+        graphData(topFit, 40, 70, 500, 200, font, maxVal)
+        graphData(avgFit, 40, 70, 500, 200, font, maxVal, 255)
+        graphData(botFit, 40, 70, 500, 200, font, maxVal)
+    except:
+        text("Creatures are currently dead,\n cannot show graph", 25, 55)
 
 def showTypeChart(x, y, sze, types, font):
     angle = 0
@@ -194,8 +224,8 @@ def showTypeChart(x, y, sze, types, font):
                 thirdType = type[0]
                 thirdTypeNo = type[1]
 
-        fill(map(noise(type[0]), 0, 1, 0, 255), map(
-            noise(type[0] + 1), 0, 1, 0, 255), map(noise(type[0] + 2), 0, 1, 0, 255))
+        fill(funcs.mapBetween(noise(type[0]), 0, 1, 0, 255), funcs.mapBetween(
+            noise(type[0] + 1), 0, 1, 0, 255), funcs.mapBetween(noise(type[0] + 2), 0, 1, 0, 255))
         prevAngle = angle
         angle = angle + (((2 * PI) / tot) * type[1])
         arc(x, y, sze, sze, prevAngle, angle)
@@ -207,14 +237,14 @@ def showTypeChart(x, y, sze, types, font):
               "\n\n2nd:    Type " + str(secondType) + "  at: " + str(float(secondTypeNo) / 10) + "%" +
               "\n\n3rd:    Type " + str(thirdType)) + "  at: " + str(float(thirdTypeNo) / 10) + "%"
 
-    fill(map(noise(firstType), 0, 1, 0, 255), map(
-        noise(firstType + 1), 0, 1, 0, 255), map(noise(firstType + 2), 0, 1, 0, 255))
+    fill(funcs.mapBetween(noise(firstType), 0, 1, 0, 255), funcs.mapBetween(
+        noise(firstType + 1), 0, 1, 0, 255), funcs.mapBetween(noise(firstType + 2), 0, 1, 0, 255))
     rect(x + 205, y - 83, 50, 20)
-    fill(map(noise(secondType), 0, 1, 0, 255), map(
-        noise(secondType + 1), 0, 1, 0, 255), map(noise(secondType + 2), 0, 1, 0, 255))
+    fill(funcs.mapBetween(noise(secondType), 0, 1, 0, 255), funcs.mapBetween(
+        noise(secondType + 1), 0, 1, 0, 255), funcs.mapBetween(noise(secondType + 2), 0, 1, 0, 255))
     rect(x + 205, y - 38, 50, 20)
-    fill(map(noise(thirdType), 0, 1, 0, 255), map(
-        noise(thirdType + 1), 0, 1, 0, 255), map(noise(thirdType + 2), 0, 1, 0, 255))
+    fill(funcs.mapBetween(noise(thirdType), 0, 1, 0, 255), funcs.mapBetween(
+        noise(thirdType + 1), 0, 1, 0, 255), funcs.mapBetween(noise(thirdType + 2), 0, 1, 0, 255))
     rect(x + 205, y + 7, 50, 20)
     fill(0)
     textFont(font, 18)

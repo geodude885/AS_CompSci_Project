@@ -18,21 +18,21 @@ def setup():
     background(21, 34, 56)
     noiseDetail(12)
     
-    global hoverButton
-    hoverButton = Button(1350, 840, 70, 40, "Info", 5)
-    
-    global killButton
-    killButton = Button(1240, 840, 70, 40, "Kill", 10)
-    
-    global reprButton
-    reprButton = Button(1020, 840 ,180, 40, "Reproduce", 10)
-    
-    global iterButton
-    iterButton = Button(1020, 760 ,180, 40, "Iteration", 10)
-    
     global font
     font = loadFont("SansSerif-120.vlw")
     textFont(font, 32)
+    
+    global hoverButton
+    hoverButton = show.Button(1350, 840, 70, 40, font, "Info", 5)
+    
+    global killButton
+    killButton = show.Button(1240, 840, 70, 40, font, "Kill", 10)
+    
+    global reprButton
+    reprButton = show.Button(1020, 840 ,180, 40, font, "Reproduce", 10)
+    
+    global iterButton
+    iterButton = show.Button(1020, 760 ,180, 40, font, "Iteration", 10)
     
     global warmthSlider 
     warmthSlider = show.Slider(850, 300, 400, font, "Warmth")
@@ -177,44 +177,22 @@ def mouseClicked():
 
         
     if reprButton.check == True:
-        global generation, genCount
+        global generation, genCount, topFit, botFit, avgFit, types
         generation = genetic_creature.removeFalses(generation)
         generation = genetic_creature.reproduction(generation)
+        topFit, botFit, avgFit = getVals(generation, topFit, botFit, avgFit)
+        types = genetic_creature.getTypes(generation)
         genCount += 1
         
     if iterButton.check == True:
-        global generation, genCount, topFit, botFit, avgFit
+        global generation, genCount, topFit, botFit, avgFit, types
         genetic_creature.updateEnvironment(warmthSlider.value, foodSlider.value, waterSlider.value, weatherSlider.value)
         generation = genetic_creature.genIteration(generation)
         topFit, botFit, avgFit = getVals(generation, topFit, botFit, avgFit)
+        types = genetic_creature.getTypes(generation)
         genCount += 1
     updateScreen()
 
-        
-    
-class Button():
-    def __init__(self, x, y, w, h, words = None, textOffset = None, colour = 210 ,tColour = 0,):
-        self.x, self.y = x, y
-        self.w, self.h = w, h
-        self.colour, self.tColour = colour, tColour
-        self.words, self.textOffset = words, textOffset
-        
-    def showButton(self):
-        fill(self.colour)
-        rect(self.x,self.y,self.w,self.h)
-        fill(self.tColour)
-        if self.words:
-            textFont(font, 32)
-            if not self.textOffset:
-                self.textOffset = 0
-            text(self.words, self.x + self.textOffset, self.y + 32)
-        
-    @property
-    def check(self):
-        if self.x < mouseX < self.x + self.w and self.y < mouseY < self.y + self.h:
-            return True
-        else: return False
-        
 def dispInfo():
     if 1355 < mouseX <1415 and 845 < mouseY < 875: 
         fill(150)
