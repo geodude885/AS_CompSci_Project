@@ -1,7 +1,7 @@
 import funcs
 import math
 
-def showCreature(creature, x, y, font):
+def showCreature(creature, x, y):
     if creature != False:
         noStroke()
         
@@ -9,45 +9,40 @@ def showCreature(creature, x, y, font):
             noise(creature.type + 1), 0, 1, 150, 255), funcs.mapBetween(noise(creature.type + 2), 0, 1, 150, 255))
         rect(x - 17, y - 17, 34, 31)
         
-        R = funcs.mapBetween(creature.stren, 0, 1, 0, 200)
-        G = funcs.mapBetween(creature.per, 0, 1, 0, 200)
-        B = funcs.mapBetween(creature.int, 0, 1, 0, 200)
+        R = funcs.mapBetween(creature.stren, 0, 1, 0, 250)
+        G = funcs.mapBetween(creature.per, 0, 1, 0, 250)
+        B = funcs.mapBetween(creature.int, 0, 1, 0, 250)
 
         fill(R, G, B)
-        noSides = funcs.mapBetween(creature.end, 0, 1, 3, 13)
+        noSides = funcs.mapBetween(creature.end, 0, 1, 3, 20)
         showSize = funcs.mapBetween(creature.sze, 0, 1, 1, 15)
 
         polygon(x, y, showSize, noSides, creature.type)
 
-        stroke(200)
-        fill(0)
-        #textFont(font, 16)
-        #text(str(creature.num), x-30, y-20)
 
     else:
         stroke(50)
         line(x - 16, y - 17, x + 16, y + 12)
         line(x + 16, y - 17, x - 16, y + 12)
 
-def drawGrid(x, y, noCols, noRows, xscl, yscl, colour, grdFill=None):
+def drawGrid(x, y, noCols, noRows, xscl, yscl, colour, gridFill=None):
     stroke(colour)
     strokeWeight(1)
-    if grdFill:
-        fill(grdFill)
+    if gridFill:
+        fill(gridFill)
         rect(x, y, (noCols * xscl), (noRows * yscl))
-
     for row in range(0, noRows + 1):
         line(x, y + row * yscl, x + noCols * xscl, y + row * yscl)
 
     for col in range(0, noCols + 1):
         line(x + col * xscl, y, x + col * xscl, y + noRows * yscl)
 
-def drawCreatureGrid(generation, font, stx, sty):
+def drawCreatureGrid(generation, stx, sty):
     xPos, yPos = stx, sty
     creatureNum = 0
     for yNum in range(25):
         for xNum in range(40):
-            showCreature(generation[creatureNum], xPos, yPos, font)
+            showCreature(generation[creatureNum], xPos, yPos)
             creatureNum += 1
             xPos += 35
         xPos = stx
@@ -72,11 +67,10 @@ def creatureInfo(creature, font):
     else:
         text("Creature is dead", mouseX + 10 - xoff, mouseY - yoff + 20)
 
-def polygon(x, y, radius, nPoints, type):  # variance is val 0-1
+def polygon(x, y, radius, nPoints, type):
     angle = TWO_PI / nPoints
 
     beginShape()
-
     i = 0
     for p in range(int(nPoints)):
         p = p * angle
@@ -126,7 +120,7 @@ class Slider(object):
     
     
 class Button():
-    def __init__(self, x, y, w, h, font, words = None, textOffset = None, colour = 210 ,tColour = 0):
+    def __init__(self, x, y, w, h, font, words, textOffset = None, colour = 210 ,tColour = 0):
         self.font = font
         self.x, self.y = x, y
         self.w, self.h = w, h
@@ -135,6 +129,7 @@ class Button():
         
     def showButton(self):
         fill(self.colour)
+        stroke(self.colour - 10)
         rect(self.x,self.y,self.w,self.h)
         fill(self.tColour)
         if self.words:
@@ -169,7 +164,7 @@ def graphData(arr, x, y, w, h, font, maxVal, rval=0,):
     dx = xspacing
 
     stroke(rval, 0, 0)
-    prevPoint = 0
+    prevPoint = arr[0]
     yMult = h / maxVal
 
     for plotPoint in arr:

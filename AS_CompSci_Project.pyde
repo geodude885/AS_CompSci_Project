@@ -89,6 +89,8 @@ def draw():
     if mousePressed:
         updateScreen()
     
+    saveFrame()
+    
 
 def updateScreen():
     clear()
@@ -103,7 +105,7 @@ U = Toggle evolve ASAP      Y = Toggle show evolution ASAP
     
     if creatScreen:
         show.drawGrid(20, 40, 40, 25, 35, 32, 200, 250)
-        show.drawCreatureGrid(generation, font, 38, height-842)
+        show.drawCreatureGrid(generation, 38, height-842)
         
         fill(200)
         textFont(font, 32)

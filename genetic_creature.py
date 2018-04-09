@@ -7,7 +7,7 @@ MAXSTARTSIZE = 0.1
 MUTATIONMAX = 0.75
 MUTATIONRATE = 13 #has to be odd
 MINVAL = 0.00001
-TYPEMUTECHANCE = 0.005
+TYPEMUTECHANCE = 0.003
 
 overallCreatureNum = 0
 nat, rem, rep = False, False, True
@@ -17,13 +17,13 @@ class Environment(object):
         self.warmth = 1.0
         self.foodDensity = 1.0
         self.waterDensity = 1.0
-        self.badWeather = 1.0
+        self.Weather = 1.0
         
     def update(self, warmth, food, water, weather):
         self.warmth = warmth
         self.foodDensity = food
-        self. waterDensity = water
-        self.badWeather = weather
+        self.waterDensity = water
+        self.weather = weather
 
 def updateEnvironment(warmth, food, water, weather):
     environment.update(warmth, food, water, weather)
@@ -127,7 +127,7 @@ class Creature(object):
     @property
     def fitness(self):
 
-        fitness = (environment.foodDensity + self.sze) * environment.warmth * environment.waterDensity / + 1 + self.per + (self.end * 2 * environment.badWeather)
+        fitness = (environment.foodDensity + self.sze) * environment.warmth * environment.waterDensity / + 1 + self.per + (self.end * 2 * environment.weather)
         fitness += self.stren * environment.foodDensity + self.int * environment.waterDensity
         return fitness
 
