@@ -4,11 +4,11 @@ import math
 def showCreature(creature, x, y):
     if creature != False:
         noStroke()
-        
+
         fill(funcs.mapBetween(noise(creature.type), 0, 1, 150, 255), funcs.mapBetween(
             noise(creature.type + 1), 0, 1, 150, 255), funcs.mapBetween(noise(creature.type + 2), 0, 1, 150, 255))
         rect(x - 17, y - 17, 34, 31)
-        
+
         R = funcs.mapBetween(creature.stren, 0, 1, 0, 250)
         G = funcs.mapBetween(creature.per, 0, 1, 0, 250)
         B = funcs.mapBetween(creature.int, 0, 1, 0, 250)
@@ -18,7 +18,6 @@ def showCreature(creature, x, y):
         showSize = funcs.mapBetween(creature.sze, 0, 1, 1, 15)
 
         polygon(x, y, showSize, noSides, creature.type)
-
 
     else:
         stroke(50)
@@ -112,38 +111,39 @@ class Slider(object):
         stroke(100)
         strokeWeight(7)
         line(self.x + self.pos, self.y - 6, self.x + self.pos, self.y + 6)
-        
 
     @property
     def value(self):
         return float(self.pos) / self.l
-    
-    
+
+
 class Button():
-    def __init__(self, x, y, w, h, font, words, textOffset = None, colour = 210 ,tColour = 0):
+
+    def __init__(self, x, y, w, h, font, words, textOffset=None, colour=210, tColour=0):
         self.font = font
         self.x, self.y = x, y
         self.w, self.h = w, h
         self.colour, self.tColour = colour, tColour
         self.words, self.textOffset = words, textOffset
-        
+
     def showButton(self):
         fill(self.colour)
         stroke(self.colour - 10)
-        rect(self.x,self.y,self.w,self.h)
+        rect(self.x, self.y, self.w, self.h)
         fill(self.tColour)
         if self.words:
             textFont(self.font, 32)
             if not self.textOffset:
                 self.textOffset = 0
             text(self.words, self.x + self.textOffset, self.y + 32)
-        
+
     @property
     def check(self):
         if self.x < mouseX < self.x + self.w and self.y < mouseY < self.y + self.h:
             return True
-        else: return False
-        
+        else:
+            return False
+
 
 def graphData(arr, x, y, w, h, font, maxVal, rval=0,):
 
@@ -189,7 +189,7 @@ def showFitGraph(font, topFit, botFit, avgFit, generation, name):
         for val in topFit:
             if val > maxVal:
                 maxVal = val
-        
+
         graphData(topFit, 40, 70, 500, 200, font, maxVal)
         graphData(avgFit, 40, 70, 500, 200, font, maxVal, 255)
         graphData(botFit, 40, 70, 500, 200, font, maxVal)

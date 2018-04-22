@@ -1,7 +1,11 @@
 __author__ = 'George'
-#screen = 2880 x 1800
+# screen = 2880 x 1800
 
-import random, time, genetic_creature, show, funcs
+import random
+import time
+import genetic_creature
+import show
+import funcs
 genLen = 1000
 generation = genetic_creature.initialise(genLen)
 genCount = 0
@@ -17,33 +21,33 @@ def setup():
     fullScreen()
     background(21, 34, 56)
     noiseDetail(12)
-    
+
     global font
     font = loadFont("SansSerif-120.vlw")
     textFont(font, 32)
-    
+
     global hoverButton
     hoverButton = show.Button(1350, 840, 70, 40, font, "Info", 5)
-    
+
     global killButton
     killButton = show.Button(1240, 840, 70, 40, font, "Kill", 10)
-    
+
     global reprButton
-    reprButton = show.Button(1020, 840 ,180, 40, font, "Reproduce", 10)
-    
+    reprButton = show.Button(1020, 840, 180, 40, font, "Reproduce", 10)
+
     global iterButton
-    iterButton = show.Button(1020, 760 ,180, 40, font, "Iteration", 10)
-    
-    global warmthSlider 
+    iterButton = show.Button(1020, 760, 180, 40, font, "Iteration", 10)
+
+    global warmthSlider
     warmthSlider = show.Slider(850, 300, 400, font, "Warmth")
-    
-    global foodSlider 
+
+    global foodSlider
     foodSlider = show.Slider(850, 370, 400, font, "Food")
-    
-    global waterSlider 
+
+    global waterSlider
     waterSlider = show.Slider(850, 440, 400, font, "Water")
-    
-    global weatherSlider 
+
+    global weatherSlider
     weatherSlider = show.Slider(850, 510, 400, font, "Weather")
     updateScreen()
 
@@ -52,45 +56,50 @@ def draw():
         if 10 < mouseX < 1430 and 30 < mouseY < height or hoverButton.check == True:
             updateScreen()
 
-    if killButton.check == True or reprButton.check == True: 
-        cursor(HAND)    
+    if killButton.check == True or reprButton.check == True:
+        cursor(HAND)
     elif hoverButton.check == True:
-            dispInfo()
-            cursor(HAND)
-    else: cursor(ARROW)
-    
+        dispInfo()
+        cursor(HAND)
+    else:
+        cursor(ARROW)
+
     if genASAP == True:
         global generation, genCount, topFit, botFit, avgFit, types
-        genetic_creature.updateEnvironment(warmthSlider.value, foodSlider.value, waterSlider.value, weatherSlider.value)
+        genetic_creature.updateEnvironment(
+            warmthSlider.value, foodSlider.value, waterSlider.value, weatherSlider.value)
         generation = genetic_creature.genIteration(generation)
         topFit, botFit, avgFit = getVals(generation, topFit, botFit, avgFit)
         types = genetic_creature.getTypes(generation)
-        
+
         genCount += 1
         updateScreen()
 
     if showGenASAP == True:
         global generation, genCount, showGenStep, topFit, botFit, avgFit
         if showGenStep == 0:
-            genetic_creature.updateEnvironment(warmthSlider.value, foodSlider.value, waterSlider.value, weatherSlider.value)
+            genetic_creature.updateEnvironment(
+                warmthSlider.value, foodSlider.value, waterSlider.value, weatherSlider.value)
             generation = genetic_creature.naturalSelection(generation)
             showGenStep = 1
             updateScreen()
-            
+
         elif showGenStep == 1:
-            generation = genetic_creature.reproduction(genetic_creature.removeFalses(generation))
-            topFit, botFit, avgFit = getVals(generation, topFit, botFit, avgFit)
+            generation = genetic_creature.reproduction(
+                genetic_creature.removeFalses(generation))
+            topFit, botFit, avgFit = getVals(
+                generation, topFit, botFit, avgFit)
             types = genetic_creature.getTypes(generation)
             showGenStep = 0
             genCount += 1
             updateScreen()
         updateScreen()
-        
+
     if mousePressed:
         updateScreen()
-    
+
     saveFrame()
-    
+
 
 def updateScreen():
     clear()
@@ -101,57 +110,54 @@ U = Toggle evolve ASAP      Y = Toggle show evolution ASAP
     fill(200)
     textFont(font, 14)
     text(controls, 20, 858)
-    
-    
+
     if creatScreen:
         show.drawGrid(20, 40, 40, 25, 35, 32, 200, 250)
-        show.drawCreatureGrid(generation, 38, height-842)
-        
+        show.drawCreatureGrid(generation, 38, height - 842)
+
         fill(200)
         textFont(font, 32)
         text("     EVOLUTION SIMULATOR V1.11", 20, 30)
         text("GEN: " + str(genCount), 1200, 30)
-        
+
         if 20 < mouseX < 1420 and 40 < mouseY < 840:
-            xIndex = int((mouseX-20)/35)
-            yIndex = int((mouseY-8)/32)
-            creatureIndex = (40*(yIndex-1) + xIndex)
+            xIndex = int((mouseX - 20) / 35)
+            yIndex = int((mouseY - 8) / 32)
+            creatureIndex = (40 * (yIndex - 1) + xIndex)
             show.creatureInfo(generation[creatureIndex], font)
-        
+
     else:
         fill(200)
         textFont(font, 52)
         text("     EVOLUTION\nSIMULATOR V1", 1060, 60)
         text("GEN: " + str(genCount), 840, 186)
-        
-        
-        show.showFitGraph(font,topFit, botFit, avgFit, generation, "Fitness:  ")
+
+        show.showFitGraph(
+            font, topFit, botFit, avgFit, generation, "Fitness:  ")
         show.showTypeChart(180, 470, 300, types, font)
-            
+
         warmthSlider.show()
         foodSlider.show()
         waterSlider.show()
         weatherSlider.show()
         stroke(200)
-        
-        
-            
+
         hoverButton.showButton()
         killButton.showButton()
         reprButton.showButton()
         iterButton.showButton()
-        
+
 def keyPressed():
-    
+
     if key == TAB:
         global creatScreen
         creatScreen = not creatScreen
         updateScreen()
-        
 
     if key in ("I", "i"):
         global generation, genCount, topFit, botFit, avgFit, types
-        genetic_creature.updateEnvironment(warmthSlider.value, foodSlider.value, waterSlider.value, weatherSlider.value)
+        genetic_creature.updateEnvironment(
+            warmthSlider.value, foodSlider.value, waterSlider.value, weatherSlider.value)
         generation = genetic_creature.genIteration(generation)
         topFit, botFit, avgFit = getVals(generation, topFit, botFit, avgFit)
         types = genetic_creature.getTypes(generation)
@@ -160,7 +166,7 @@ def keyPressed():
     if key in ("U", "u"):
         global genASAP
         genASAP = not genASAP
-        
+
     if key in ("Y", "y"):
         if showGenStep == 0:
             global showGenASAP
@@ -168,16 +174,17 @@ def keyPressed():
         else:
             global showGenASAP, generation
             showGenASAP = not showGenASAP
-            generation = genetic_creature.reproduction(genetic_creature.removeFalses(generation))
-            
+            generation = genetic_creature.reproduction(
+                genetic_creature.removeFalses(generation))
+
 def mouseClicked():
-    
+
     if killButton.check == True:
         global generation
-        genetic_creature.updateEnvironment(warmthSlider.value, foodSlider.value, waterSlider.value, weatherSlider.value)
+        genetic_creature.updateEnvironment(
+            warmthSlider.value, foodSlider.value, waterSlider.value, weatherSlider.value)
         generation = genetic_creature.naturalSelection(generation)
 
-        
     if reprButton.check == True:
         global generation, genCount, topFit, botFit, avgFit, types
         generation = genetic_creature.removeFalses(generation)
@@ -185,10 +192,11 @@ def mouseClicked():
         topFit, botFit, avgFit = getVals(generation, topFit, botFit, avgFit)
         types = genetic_creature.getTypes(generation)
         genCount += 1
-        
+
     if iterButton.check == True:
         global generation, genCount, topFit, botFit, avgFit, types
-        genetic_creature.updateEnvironment(warmthSlider.value, foodSlider.value, waterSlider.value, weatherSlider.value)
+        genetic_creature.updateEnvironment(
+            warmthSlider.value, foodSlider.value, waterSlider.value, weatherSlider.value)
         generation = genetic_creature.genIteration(generation)
         topFit, botFit, avgFit = getVals(generation, topFit, botFit, avgFit)
         types = genetic_creature.getTypes(generation)
@@ -196,14 +204,14 @@ def mouseClicked():
     updateScreen()
 
 def dispInfo():
-    if 1355 < mouseX <1415 and 845 < mouseY < 875: 
+    if 1355 < mouseX < 1415 and 845 < mouseY < 875:
         fill(150)
-        rect(1420,880, -1320, -600)
+        rect(1420, 880, -1320, -600)
         fill(0)
         textFont(font, 32)
         textLeading(15)
         text(
-         """Info\n
+            """Info\n
 \n
 This page shows information about the creatures,\n
 and allows you to change their environment.\n
@@ -216,9 +224,9 @@ then worked out from its attributes, taking into\n
 account the environment settings.\n
 \n
 """
-         , 620, 320)
+            , 620, 320)
         text(
-         """How Attributes\n
+            """How Attributes\n
 Effect Creatures:\n
 
 Creature Number:\n
@@ -237,12 +245,13 @@ Size:\n
 
 \n
 """
-         , 120, 320)
-    else: updateScreen()
+            , 120, 320)
+    else:
+        updateScreen()
 #fitness = (environment.foodDensity + self.sze) * environment.warmth * environment.waterDensity / self.stren + self.per + (self.end * 2 * environment.badWeather)
-            
+
 def getVals(generation, top, bot, mid):
     top.append(generation[0].fitness)
     bot.append(generation[-1].fitness)
-    mid.append(generation[len(generation)/2].fitness)
+    mid.append(generation[len(generation) / 2].fitness)
     return top, bot, mid
