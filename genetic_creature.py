@@ -11,7 +11,7 @@ TYPEMUTECHANCE = 0.003
 
 overallCreatureNum = 0
 nat, rem, rep = False, False, True
-
+#Pretty much just used as a wrapper for the environment variables
 class Environment(object):
     def __init__(self):
         self.warmth = 1.0
@@ -38,12 +38,13 @@ def initialise(genLen):
     generation.reverse()
     return generation
 
+#THE creature class
 class Creature(object):
     def __init__(self, num, parent=None):
         self.num = num
         self.parent = parent
         self.pnum = num
-        
+        #try loop fails on first generation as no parent is given, so initialises brand new creature. (Only used for first generation)
         try:
             self.sze = -1
             self.per = -1
@@ -58,7 +59,7 @@ class Creature(object):
             else:    
                 typeMute = False
                 self.type = parent.type
-                
+            #self.fitness = -1
             while self.fitness <= 0:
                 
                 if typeMute == False:
@@ -107,7 +108,11 @@ class Creature(object):
                     self.end = MINVAL
                     
                 self.pnum = parent.num
-
+                """
+                self.fitness = (environment.foodDensity + self.sze) * environment.warmth * environment.waterDensity / (1 + self.per + (self.end * 2 * environment.weather))
+                self.fitness += self.stren * environment.foodDensity + self.int * environment.waterDensity + self.per * environment.waterDensity * environment.foodDensity + self.end / environment.foodDensity
+                """
+        #Initialises new creature without parent
         except AttributeError:
             
             global overallCreatureNum
@@ -115,24 +120,26 @@ class Creature(object):
             self.parent = None
             self.pnum = "No parent"
             self.type = overallCreatureNum
-            
+            #self.fitness = -1
             while self.fitness <= 0:
                 self.sze = random.uniform(MINVAL, MAXSTARTSIZE)
                 self.per = random.uniform(MINVAL, self.sze)
                 self.stren = random.uniform(MINVAL, self.sze)
                 self.int = random.uniform(MINVAL, self.sze)
                 self.end = random.uniform(MINVAL, self.sze)
-
-
+                """
+                self.fitness = (environment.foodDensity + self.sze) * environment.warmth * environment.waterDensity / (1 + self.per + (self.end * 2 * environment.weather))
+                self.fitness += self.stren * environment.foodDensity + self.int * environment.waterDensity + self.per * environment.waterDensity * environment.foodDensity + self.end / environment.foodDensity
+                """
+    #The fitness function
     @property
     def fitness(self):
-
-        fitness = (environment.foodDensity + self.sze) * environment.warmth * environment.waterDensity / + 1 + self.per + (self.end * 2 * environment.weather)
-        fitness += self.stren * environment.foodDensity + self.int * environment.waterDensity
+        fitness = (environment.foodDensity + self.sze) * environment.warmth * environment.waterDensity / (1 + self.per + (self.end * 2 * environment.weather))
+        fitness += self.stren * environment.foodDensity + self.int * environment.waterDensity + self.per * environment.waterDensity * environment.foodDensity + self.end / environment.foodDensity
         return fitness
-
+    
         
-
+    #Returns creature's info in a string
     def __str__(self):
         return ("Creature " + str(self.num) +
         "\nFitness: " + str(round(self.fitness, 4)) +
@@ -143,15 +150,8 @@ class Creature(object):
         "\nEndurance:" + str(round(self.end,4)) + 
         "\nParent: " + str(self.pnum) +
         "\nType: " + str(self.type))
-    
 
-    #sze           0 - 1                      DONE
-    #perception    0 - 1                      DONE
-    #strength      0 - 1                      DONE
-    #intelligence  0 - 1                      DONE
-    #endurance     0 - 1                      DONE
-
-    
+#Kills creatures based upon their fitness
 def naturalSelection(generation):
     global nat, rep
     if rep == True:
@@ -170,7 +170,7 @@ def naturalSelection(generation):
         nat = True 
         rep = False
     return generation
-    
+#Reproduces all creatures from the survivors of a generation
 def reproduction(generation):
     global rem, rep
     if rem == True:
@@ -183,11 +183,10 @@ def reproduction(generation):
         rem = False
         rep = True
     return generation
-
+#Removes all the 'false' placeholders used in the generation array
 def removeFalses(generation):
     global rep, rem
     if nat == True:
-        
         while False in generation:
             for creature in generation:
                 if creature == False:
@@ -198,12 +197,12 @@ def removeFalses(generation):
     return generation
     
     
-
+#Completes and returns full iteration on generation
 def genIteration(generation):
     return reproduction(removeFalses(naturalSelection(generation)))
 
+#generates the list of types required for the pie chart
 def getTypes(generation):
-    
     types = []
     for creature in generation:
         if creature.type not in [type[0] for type in types]:

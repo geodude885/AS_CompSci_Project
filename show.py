@@ -1,6 +1,6 @@
 import funcs
 import math
-
+#Shows a creature at a point
 def showCreature(creature, x, y):
     if creature != False:
         noStroke()
@@ -24,7 +24,7 @@ def showCreature(creature, x, y):
         stroke(50)
         line(x - 16, y - 17, x + 16, y + 12)
         line(x + 16, y - 17, x - 16, y + 12)
-
+#Draws the lines of a grid
 def drawGrid(x, y, noCols, noRows, xscl, yscl, colour, gridFill=None):
     stroke(colour)
     strokeWeight(1)
@@ -36,7 +36,7 @@ def drawGrid(x, y, noCols, noRows, xscl, yscl, colour, gridFill=None):
 
     for col in range(0, noCols + 1):
         line(x + col * xscl, y, x + col * xscl, y + noRows * yscl)
-
+#Draws the creatures of a generation in a grid pattern
 def drawCreatureGrid(generation, stx, sty):
     xPos, yPos = stx, sty
     creatureNum = 0
@@ -47,12 +47,12 @@ def drawCreatureGrid(generation, stx, sty):
             xPos += 35
         xPos = stx
         yPos += 32
-
+#displays the creature's info next to the mouse when hovered over
 def creatureInfo(creature, font):
     if mouseY < height / 2:
         yoff = 0
     else:
-        yoff = 150
+        yoff = 190
     if mouseX > width / 2:
         xoff = 180
     else:
@@ -60,13 +60,13 @@ def creatureInfo(creature, font):
 
     fill(150)
     textFont(font, 16)
-    rect(mouseX - xoff, mouseY - yoff - 20, 180, 180)
+    rect(mouseX - xoff, mouseY - yoff - 20, 180, 190)
     fill(0)
     if creature:
         text(str(creature), mouseX + 10 - xoff, mouseY - yoff)
     else:
         text("Creature is dead", mouseX + 10 - xoff, mouseY - yoff + 20)
-
+#Draws a polygon using random noise
 def polygon(x, y, radius, nPoints, type):
     angle = TWO_PI / nPoints
 
@@ -80,7 +80,7 @@ def polygon(x, y, radius, nPoints, type):
         vertex(dx, dy)
     endShape(CLOSE)
 
-
+#Slider object, draws and returns value
 class Slider(object):
 
     def __init__(self, x, y, l, font, name):
@@ -118,7 +118,7 @@ class Slider(object):
     def value(self):
         return float(self.pos) / self.l
     
-    
+#Button object, draws and checks if mouse is over itself
 class Button():
     def __init__(self, x, y, w, h, font, words, textOffset = None, colour = 210 ,tColour = 0):
         self.font = font
@@ -133,10 +133,10 @@ class Button():
         rect(self.x,self.y,self.w,self.h)
         fill(self.tColour)
         if self.words:
-            textFont(self.font, 32)
+            textFont(self.font, 16)
             if not self.textOffset:
                 self.textOffset = 0
-            text(self.words, self.x + self.textOffset, self.y + 32)
+            text(self.words, self.x + self.textOffset, self.y + 27)
         
     @property
     def check(self):
@@ -144,7 +144,7 @@ class Button():
             return True
         else: return False
         
-
+# Draws line graph from array of numbers
 def graphData(arr, x, y, w, h, font, maxVal, rval=0,):
 
     stroke(0)
@@ -177,7 +177,7 @@ def graphData(arr, x, y, w, h, font, maxVal, rval=0,):
 
         prevPoint = plotPoint
         dx += xspacing
-
+#Draws 3 line graphs on top of each other. The middle line will be red
 def showFitGraph(font, topFit, botFit, avgFit, generation, name):
     strokeWeight(1)
     rect(10, 10, 550, 280)
@@ -194,8 +194,8 @@ def showFitGraph(font, topFit, botFit, avgFit, generation, name):
         graphData(avgFit, 40, 70, 500, 200, font, maxVal, 255)
         graphData(botFit, 40, 70, 500, 200, font, maxVal)
     except:
-        text("Creatures are currently dead,\n cannot show graph", 25, 55)
-
+        text("Creatures are currently dead,\n cannot show graph", 55, 85)
+#Draws the pie chart, using the output from 'getTypes'
 def showTypeChart(x, y, sze, types, font):
     angle = 0
     tot = 0
